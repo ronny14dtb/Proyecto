@@ -1,0 +1,137 @@
+2. El siguiente fragmento de código pertenece al componente customer.component.ts en Angular.
+Las variables: customer, refresh y errorLoadEvent, son utilizadas para establecer una comunicación
+entre este componente y cualquier otro que lo utilice.
+@Component({
+selector: &#39;app-customer&#39;,
+templateUrl: &#39;./customer.component.html&#39;,
+styleUrls: [&#39;./customer.component.css&#39;]
+})
+export class CustomerComponent implements OnInit {
+@Input() customer: any = null;
+@Input() refresh: Subject&lt;any&gt;;
+@Output() errorLoadEvent = new EventEmitter();
+ngOnInit(): void {
+this.refresh.subscribe((change) =&gt; {
+onRefresh(change);
+}
+}
+De acuerdo con esto:
+- Describa cómo funciona la comunicación de cada una de esas variables.
+- Escriba el código HTML y TS de un componente que utilice a customer.component.ts
+
+
+
+
+Respuesta
+
+
+Explicación de la comunicación entre componentes
+
+
+@Input() customer → El padre le manda los datos del cliente al hijo.
+@Input() refresh → El padre le avisa al hijo cuando debe actualizarse.
+@Output() errorLoadEvent → El hijo le manda errores al padre cuando hay problemas.
+
+Básicamente, el padre controla la información y el hijo la muestra. Si algo falla en el hijo, avisa al padre.
+
+
+
+
+3. Describa en pocas palabras cual es la diferencia entre Eager Loading y lazy loading en Angular
+
+
+Eager Loading → Carga todos los módulos al inicio, lo que hace que la app arranque más lento pero tenga todo listo.
+Lazy Loading → Carga módulos solo cuando se necesitan, mejorando el tiempo de inicio y el rendimiento, (Importando los módulos necesarios según sean requeridos).
+
+
+
+4. Describa que es un Guard y que es un Interceptor en Angular, de ejemplos de cómo se pueden
+utilizar.
+
+Guard 
+Un Guard en Angular se usa para controlar el acceso a rutas. Sirve para permitir o bloquear la navegación según ciertas condiciones, como si un usuario está autenticado.
+
+
+//
+
+import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private router: Router) {}
+
+  canActivate(): boolean {
+    const isLoggedIn = !!localStorage.getItem('token'); // Simulación de autenticación
+    if (!isLoggedIn) {
+      this.router.navigate(['/login']); // Redirige si no está autenticado
+      return false;
+    }
+    return true;
+  }
+}
+
+// En el routing module.ts
+
+{ path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
+//
+
+
+
+Interceptor 
+Un Interceptor se encarga de la manipulación de solicitudes HTTP (request) y sus respuestas (responses). Se ocupa para manipulación de solicitudes (REST), tokens de autenticación o manejar errores globales.
+
+//
+
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    const token = localStorage.getItem('token'); // Simulación de token
+    const clonedReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+    return next.handle(clonedReq);
+  }
+}
+
+// module.ts
+
+providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }]
+
+//
+
+
+
+conclusión
+Guard → Controla acceso a rutas.
+Interceptor → Modifica solicitudes/respuestas HTTP.
+
+
+
+5. Describa en sus palabras los siguientes eventos del ciclo de vida de un componente:
+
+ngOnInit
+ngAfterViewInit
+ngOnChanges
+
+1- ngOnInit
+Se ejecuta una vez cuando el componente se inicializa.Se usa para cargar datos o realizar configuraciones iniciales.
+
+2- ngAfterViewInit
+Se ejecuta cuando la vista y los elementos hijos han sido renderizados.Se usa para manipular el DOM o inicializar librerías externas.
+
+3- ngOnChanges:
+Se ejecuta cuando cambian los valores de las propiedades @Input(). Se usa para reaccionar a cambios en los datos recibidos desde un componente padre.
+
+
+Conclusión
+ngOnInit → Se ejecuta al iniciar el componente.
+ngAfterViewInit → Se ejecuta cuando la vista está lista.
+ngOnChanges → Se ejecuta cuando cambian los valores de entrada (@Input).
+
+

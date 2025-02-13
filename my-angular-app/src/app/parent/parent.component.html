@@ -1,0 +1,3 @@
+<p>parent works!</p>
+<app-customer [customer]="customer" [refresh]="refresh" (errorLoadEvent)="onErrorReceived($event)"></app-customer>
+<button (click)="refreshCustomer()">Actualizar Cliente</button>
